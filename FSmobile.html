@@ -22,6 +22,8 @@
     const osmBuildings = await Cesium.createOsmBuildingsAsync();
     viewer.scene.primitives.add(osmBuildings);
 
+    var airCraftPosition = {"longitude":-122.360579, "latitude":37.611763, "height":-27.32};
+
     const flightData = JSON.parse(
       '[{"longitude":-122.360579,"latitude":37.611763,"height":-27.32},{"latitude":37.612057,"longitude":-122.360356,"height":-27.32}]'
     );
@@ -94,15 +96,26 @@
    
       // viewer.trackedEntity = airplaneEntity;
 
-      const center = Cesium.Cartesian3.fromDegrees(-122.360579, 37.611763, -27.32)
+      const center = Cesium.Cartesian3.fromDegrees(airCraftPosition.longitude, airCraftPosition.latitude, airCraftPosition.height)
 
       const heading = Cesium.Math.toRadians(-55.0);
       const pitch = Cesium.Math.toRadians(-10.0);
       const range = 40.0;
-      viewer.camera.lookAt(center, new Cesium.HeadingPitchRange(heading, pitch, range));
+      const headingPitchRange = new Cesium.HeadingPitchRange(heading, pitch, range)
+      viewer.camera.lookAt(center, headingPitchRange);
+
+      window.addEventListener("keypress", function(){
+        airCraftPosition.longitude += 0.000001;
+        airCraftPosition.latitude += 0.000001;
+
+        var newPosition = Cesium.Cartesian3.fromDegrees(airCraftPosition.longitude, airCraftPosition.latitude, airCraftPosition.height);
+        airplaneEntity.position = newPosition
+
+        viewer.camera.lookAt(newPosition, headingPitchRange);
+      });
     }
     
-loadModel();   
+    loadModel();   
   </script>
  </div>
 </body>
