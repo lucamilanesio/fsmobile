@@ -104,18 +104,63 @@
       const headingPitchRange = new Cesium.HeadingPitchRange(heading, pitch, range)
       viewer.camera.lookAt(center, headingPitchRange);
 
-      window.addEventListener("keypress", function(){
-        airCraftPosition.longitude += 0.000001;
-        airCraftPosition.latitude += 0.000001;
+      const toolbar = document.querySelector("div.cesium-viewer-toolbar");
+      const modeButton = document.querySelector("span.cesium-sceneModePicker-wrapper");
 
-        var newPosition = Cesium.Cartesian3.fromDegrees(airCraftPosition.longitude, airCraftPosition.latitude, airCraftPosition.height);
-        airplaneEntity.position = newPosition
+      const accButton = document.createElement("button");
+      accButton.classList.add("cesium-button", "cesium-toolbar-button");
+      accButton.innerHTML = "accelerate";
+      accButton.style.width = "64px";
+      toolbar.insertBefore(accButton, modeButton);
 
-        viewer.camera.lookAt(newPosition, headingPitchRange);
+      const brakeButton = document.createElement("button");
+      brakeButton.classList.add("cesium-button", "cesium-toolbar-button");
+      brakeButton.innerHTML = "brake";
+      brakeButton.style.width = "50px";
+      toolbar.insertBefore(brakeButton, modeButton);
+
+ const rightButton = document.createElement("button");
+      rightButton.classList.add("cesium-button", "cesium-toolbar-button");
+      rightButton.innerHTML = ">";
+      rightButton.style.width = "32px";
+      toolbar.insertBefore(rightButton, modeButton);
+
+      var speed = 0;
+
+      var steer = 0;
+
+      window.setInterval(function(){
+        if (speed > 0) {
+          airCraftPosition.longitude += (speed * (1 + steer));
+          airCraftPosition.latitude += speed;
+
+          var newPosition = Cesium.Cartesian3.fromDegrees(airCraftPosition.longitude, airCraftPosition.latitude, airCraftPosition.height);
+          airplaneEntity.position = newPosition;
+
+          viewer.camera.lookAt(newPosition, headingPitchRange);
+        }
+      }, 100);
+
+
+      accButton.addEventListener("click", function() {
+        speed += 0.000001;
+      });
+
+      brakeButton.addEventListener("click", function() {
+        if (speed > 0) {
+          speed -= 0.000001;
+        } else {
+          speed = 0;
+        }
+      });
+
+      rightButton.addEventListener("click", function() {
+         steer += 1;
       });
     }
     
-    loadModel();   
+
+    loadModel();
   </script>
  </div>
 </body>
