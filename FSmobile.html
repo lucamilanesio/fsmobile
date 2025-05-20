@@ -119,7 +119,7 @@
       brakeButton.style.width = "50px";
       toolbar.insertBefore(brakeButton, modeButton);
 
- const rightButton = document.createElement("button");
+      const rightButton = document.createElement("button");
       rightButton.classList.add("cesium-button", "cesium-toolbar-button");
       rightButton.innerHTML = ">";
       rightButton.style.width = "32px";
@@ -128,14 +128,21 @@
       var speed = 0;
 
       var steer = 0;
+      var steerAngle = -59;
 
       window.setInterval(function(){
         if (speed > 0) {
+          var oldPosition = Cesium.Cartesian3.fromDegrees(airCraftPosition.longitude, airCraftPosition.latitude, airCraftPosition.height);
+
           airCraftPosition.longitude += (speed * (1 + steer));
           airCraftPosition.latitude += speed;
 
           var newPosition = Cesium.Cartesian3.fromDegrees(airCraftPosition.longitude, airCraftPosition.latitude, airCraftPosition.height);
           airplaneEntity.position = newPosition;
+
+          var hpr = Cesium.HeadingPitchRoll.fromDegrees(steerAngle, 0, 0)
+          var orientation = new Cesium.ConstantProperty(Cesium.Transforms.headingPitchRollQuaternion(newPosition, hpr));
+          airplaneEntity.orientation = orientation;
 
           viewer.camera.lookAt(newPosition, headingPitchRange);
         }
@@ -155,7 +162,8 @@
       });
 
       rightButton.addEventListener("click", function() {
-         steer += 1;
+         steer += 0.1;
+         steerAngle += 1;
       });
     }
     
