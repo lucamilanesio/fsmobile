@@ -125,10 +125,23 @@
       rightButton.style.width = "32px";
       toolbar.insertBefore(rightButton, modeButton);
 
+      const leftButton = document.createElement("button");
+      leftButton.classList.add("cesium-button", "cesium-toolbar-button");
+      leftButton.innerHTML = "<";
+      leftButton.style.width = "32px";
+      toolbar.insertBefore(leftButton, modeButton);
+
+      const upButton = document.createElement("button");
+      upButton.classList.add("cesium-button", "cesium-toolbar-button");
+      upButton.innerHTML = "^";
+      upButton.style.width = "32px";
+      toolbar.insertBefore(upButton, modeButton);
+
       var speed = 0;
 
       var steer = 0;
       var steerAngle = -59;
+      var altitude = 0;
 
       window.setInterval(function(){
         if (speed > 0) {
@@ -136,6 +149,7 @@
 
           airCraftPosition.longitude += (speed * (1 + steer));
           airCraftPosition.latitude += speed;
+          airCraftPosition.height += altitude;          
 
           var newPosition = Cesium.Cartesian3.fromDegrees(airCraftPosition.longitude, airCraftPosition.latitude, airCraftPosition.height);
           airplaneEntity.position = newPosition;
@@ -164,6 +178,15 @@
       rightButton.addEventListener("click", function() {
          steer += 0.1;
          steerAngle += 1;
+      });
+
+      leftButton.addEventListener("click", function() {
+         steer -= 0.1;
+         steerAngle -= 1;
+      });
+
+      upButton.addEventListener("click", function() {
+         altitude += 0.1;
       });
     }
     
