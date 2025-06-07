@@ -137,13 +137,24 @@
       upButton.style.width = "32px";
       toolbar.insertBefore(upButton, modeButton);
 
+      const downButton = document.createElement("button");
+      downButton.classList.add("cesium-button", "cesium-toolbar-button");
+      downButton.innerHTML = "v";
+      downButton.style.width = "32px";
+      toolbar.insertBefore(downButton, modeButton);
+
+
       var speed = 0;
+      var acceleration = 0;
 
       var steer = 0;
       var steerAngle = -59;
+      var noseAngle = 0;
       var altitude = 0;
 
       window.setInterval(function(){
+        speed += acceleration
+
         if (speed > 0) {
           var oldPosition = Cesium.Cartesian3.fromDegrees(airCraftPosition.longitude, airCraftPosition.latitude, airCraftPosition.height);
 
@@ -154,7 +165,7 @@
           var newPosition = Cesium.Cartesian3.fromDegrees(airCraftPosition.longitude, airCraftPosition.latitude, airCraftPosition.height);
           airplaneEntity.position = newPosition;
 
-          var hpr = Cesium.HeadingPitchRoll.fromDegrees(steerAngle, 0, 0)
+          var hpr = Cesium.HeadingPitchRoll.fromDegrees(steerAngle, noseAngle, 0)
           var orientation = new Cesium.ConstantProperty(Cesium.Transforms.headingPitchRollQuaternion(newPosition, hpr));
           airplaneEntity.orientation = orientation;
 
@@ -162,32 +173,51 @@
         }
       }, 100);
 
+      var buttonDownEvent = "mousedown"
+      var buttonUpEvent = "mouseup"
 
-      accButton.addEventListener("click", function() {
-        speed += 0.000001;
+
+      accButton.addEventListener(buttonDownEvent, function() {
+        acceleration += 0.000001;
       });
 
-      brakeButton.addEventListener("click", function() {
+      accButton.addEventListener(buttonUpEvent, function() {
+        acceleration = 0;
+      });
+
+      brakeButton.addEventListener(buttonDownEvent, function() {
         if (speed > 0) {
-          speed -= 0.000001;
+          acceleration -= 0.000001;
         } else {
           speed = 0;
         }
       });
 
-      rightButton.addEventListener("click", function() {
+      brakeButton.addEventListener(buttonUpEvent, function() {
+        acceleration = 0;
+      });
+
+      rightButton.addEventListener(buttonDownEvent, function() {
          steer += 0.1;
          steerAngle += 1;
       });
 
-      leftButton.addEventListener("click", function() {
+      leftButton.addEventListener(buttonDownEvent, function() {
          steer -= 0.1;
          steerAngle -= 1;
       });
 
-      upButton.addEventListener("click", function() {
-         altitude += 0.1;
+      upButton.addEventListener(buttonDownEvent, function() {
+         altitude += 0.1
+         speed += 0.00001
+         noseAngle += 1
       });
+
+      downButton.addEventListener(buttonDownEvent, function() {
+         altitude -= 0.1
+         noseAngle -= 1
+      });
+
     }
     
 
